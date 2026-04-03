@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang='zh-CN'>
+<head>
+    <meta charset='UTF-8'>
+    <meta name='viewport' content='width=device-width,initial-scale=1.0'>
+    <title>智能插排控制</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class='bg-decoration'>
+        <div class='plug-deco'>💡</div>
+        <div class='plug-deco'>🔋</div>
+        <div class='plug-deco'>🔌</div>
+        <div class='plug-deco'>⚡</div>
+    </div>
+
+    <div class='container'>
+        <!-- IP配置区域（默认隐藏） -->
+        <div class='ip-config' id='ipConfigPanel' style='display: none;'>
+            <div class='ip-config-title'>⚙️ ESP32 IP地址配置</div>
+            <input type='text' id='esp32IpInput' class='ip-config-input' placeholder='例如: 10.212.215.31' value='10.212.215.31'>
+            <button class='ip-config-btn' onclick='saveIpConfig()'>保存</button>
+            <div style='color:#f57c00;font-size:11px;margin-top:8px'>请输入ESP32的IP地址</div>
+        </div>
+
+        <div class='power-strip'>
+            <div class='power-indicator'></div>
+            <div class='brand'>
+                <div class='brand-name'><span class='brand-logo'>⚡</span>有才✿安全节能插排</div>
+                <div class='status-indicator'>
+                    <span class='led-indicator'></span>
+                    <span id='connectionStatus'>离线</span>
+                    <button class='settings-btn' onclick='toggleIpConfig()' title='IP配置'>⚙️</button>
+                    <button class='logout-btn' onclick='logout()' title='退出登录'>🚪</button>
+                </div>
+            </div>
+
+            <div class='outlet-section'>
+                <div class='outlet-title'>🔌 电源插座</div>
+                <div class='outlet' id='outlet1'>
+                    <div class='outlet-header'>
+                        <div>
+                            <div class='outlet-icon'>🔌</div>
+                            <div class='outlet-label'>插座 1</div>
+                            <div class='outlet-status' id='status1'>加载中...</div>
+                        </div>
+                        <label class='toggle-switch'>
+                            <input type='checkbox' id='sw1'>
+                            <span class='slider'></span>
+                        </label>
+                    </div>
+                    <div class='power-data'>
+                        <div class='power-item'><span class='power-icon'>⚡</span><span id='voltage'>--V</span></div>
+                        <div class='power-item'><span class='power-icon'>🔌</span><span id='current'>--A</span></div>
+                        <div class='power-item'><span class='power-icon'>💡</span><span id='power'>--W</span></div>
+                        <div class='power-item energy-history-link' onclick='goToEnergyHistory()' title='查看电量使用记录'>
+                            <span class='power-icon'>📊</span>
+                            <span id='energy'>--Wh</span>
+                            <div class='history-hint'>点击查看记录</div>
+                        </div>
+                    </div>
+                    <div class='energy-config'>
+                        <div class='config-title'>⚡ 节能配置</div>
+                        <div class='config-row'>
+                            <label class='mini-switch'><input type='checkbox' id='energySavingToggle' checked><span class='mini-slider'></span></label>
+                            <span>节能模式</span>
+                        </div>
+                        <div class='config-row'>
+                            <label>功率阈值：</label>
+                            <input type='number' id='powerThreshold' value='5' min='0' max='1000' step='0.1' class='config-input'>
+                            <span>W</span>
+                        </div>
+                        <div class='config-row'>
+                            <label>持续时间：</label>
+                            <input type='number' id='lowPowerDuration' value='300' min='10' max='3600' step='10' class='config-input'>
+                            <span>秒</span>
+                        </div>
+                        <button class='config-btn' onclick='saveEnergyConfig()'>保存配置</button>
+                    </div>
+                    <div class='energy-config' style='margin-top:10px'>
+                        <div class='config-title'>⏰ 定时开关</div>
+                        <div class='config-row'>
+                            <label class='mini-switch'><input type='checkbox' id='timerToggle'><span class='mini-slider'></span></label>
+                            <span>定时功能</span>
+                        </div>
+                        <div class='config-row'>
+                            <label>定时时间：</label>
+                            <input type='number' id='timerHour' value='0' min='0' max='23' class='config-input' style='width:50px'>
+                            <span>:</span>
+                            <input type='number' id='timerMinute' value='0' min='0' max='59' class='config-input' style='width:50px'>
+                        </div>
+                        <div class='config-row'>
+                            <label>执行动作：</label>
+                            <select id='timerAction' class='config-input' style='width:80px'>
+                                <option value='on'>开启</option>
+                                <option value='off'>关闭</option>
+                            </select>
+                        </div>
+                        <button class='config-btn' onclick='saveTimerConfig()'>保存定时</button>
+                    </div>
+                    <div class='energy-config' style='margin-top:10px'>
+                        <div class='config-title'>🛡️ 安全模式</div>
+                        <div class='config-row'>
+                            <label class='mini-switch'><input type='checkbox' id='safetyToggle' checked><span class='mini-slider'></span></label>
+                            <span>过载保护</span>
+                        </div>
+                        <div class='config-row'>
+                            <label>功率上限：</label>
+                            <input type='number' id='safetyLimit' value='2000' min='100' max='5000' step='10' class='config-input'>
+                            <span>W</span>
+                        </div>
+                        <div style='font-size:11px;color:rgba(255,255,255,0.6);margin-top:5px;padding:0 5px'>超过此功率将立即断电保护</div>
+                        <button class='config-btn' onclick='saveSafetyConfig()'>保存配置</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class='temp-monitor'>
+                <div class='temp-title'>🌡️ 温度监测</div>
+                <div class='temp-grid'>
+                    <div class='temp-card'>
+                        <div class='temp-icon'>🌡️</div>
+                        <div class='temp-badge normal' id='badge1'>正常</div>
+                        <div class='temp-value normal' id='temp1'>--°C</div>
+                        <div class='temp-label'>传感器 1</div>
+                    </div>
+                    <div class='temp-card'>
+                        <div class='temp-icon'>🌡️</div>
+                        <div class='temp-badge normal' id='badge2'>正常</div>
+                        <div class='temp-value normal' id='temp2'>--°C</div>
+                        <div class='temp-label'>传感器 2</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class='info-bar'>
+                <div class='info-item'>设备IP: <span class='info-value' id='ipInfo'>未连接</span></div>
+                <div class='update-time'>最后更新: <span id='time'>--:--:--</span></div>
+            </div>
+        </div>
+        <div class='footer'>冯有才 | 基于多模态与边缘智能的安全节能插排</div>
+    </div>
+
+    <script src='app.js'></script>
+</body>
+</html>

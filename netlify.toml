@@ -1,0 +1,22 @@
+# Netlify配置文件
+
+[build]
+  # 发布目录（静态文件）
+  publish = "."
+  
+  # 构建命令（如果需要）
+  # command = "npm run build"
+
+# Functions配置
+[functions]
+  directory = "netlify/functions"
+
+# 重定向规则 - 将/api/*请求重定向到Serverless Function
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/api/:splat"
+  status = 200
+  force = true
+
+# 环境变量（在Netlify控制台设置）
+# ESP32_IP = "你的ESP32 IP地址"

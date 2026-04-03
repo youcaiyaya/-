@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  smart-power-control:
+    build: .
+    container_name: smart-power-control
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - ESP32_IP=10.212.215.31
+      - PORT=3000
+    restart: unless-stopped
+    networks:
+      - smart-home
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  smart-home:
+    driver: bridge

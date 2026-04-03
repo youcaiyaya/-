@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能插排控制系统 - 登录</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body>
+    <div class="login-container">
+        <!-- 背景装饰 -->
+        <div class="bg-decoration">
+            <div class="plug-icon plug-1">🔌</div>
+            <div class="plug-icon plug-2">⚡</div>
+            <div class="plug-icon plug-3">💡</div>
+            <div class="plug-icon plug-4">🔋</div>
+        </div>
+
+        <!-- 登录卡片 -->
+        <div class="login-card">
+            <!-- 插排形象 -->
+            <div class="robot-container">
+                <div class="robot">
+                    <div class="robot-head">
+                        <div class="antenna"></div>
+                        <div class="robot-face">
+                            <div class="eyes" id="robotEyes">
+                                <div class="eye left-eye">
+                                    <div class="pupil"></div>
+                                </div>
+                                <div class="eye right-eye">
+                                    <div class="pupil"></div>
+                                </div>
+                            </div>
+                            <div class="robot-hands" id="robotHands"></div>
+                            <div class="mouth"></div>
+                        </div>
+                    </div>
+                    <div class="robot-body">
+                        <div class="power-button"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 标题 -->
+            <div class="login-header">
+                <div class="logo">
+                    <span class="logo-icon">⚡</span>
+                    <span class="logo-text">智能插排控制系统</span>
+                </div>
+                <p class="subtitle">安全 · 节能 · 智能</p>
+            </div>
+
+            <!-- 登录表单 -->
+            <form class="login-form" id="loginForm">
+                <div class="input-group">
+                    <div class="input-icon">👤</div>
+                    <input 
+                        type="text" 
+                        id="username" 
+                        class="login-input" 
+                        placeholder="请输入账号"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <div class="input-icon">🔒</div>
+                    <input 
+                        type="password" 
+                        id="password" 
+                        class="login-input" 
+                        placeholder="请输入密码"
+                        autocomplete="current-password"
+                        required
+                    >
+                    <div class="password-toggle" id="passwordToggle">👁️</div>
+                </div>
+
+                <div class="remember-row">
+                    <label class="remember-checkbox">
+                        <input type="checkbox" id="remember">
+                        <span>记住我</span>
+                    </label>
+                    <a href="#" class="forgot-link">忘记密码？</a>
+                </div>
+
+                <button type="submit" class="login-button">
+                    <span class="button-text">登录</span>
+                    <span class="button-icon">→</span>
+                </button>
+
+                <div class="error-message" id="errorMessage"></div>
+            </form>
+
+            <!-- 底部信息 -->
+            <div class="login-footer">
+                <p>基于多模态与边缘智能的安全节能插排</p>
+                <p class="author">© 20221418105 冯有才</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>

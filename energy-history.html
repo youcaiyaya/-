@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>电量使用记录 - 智能插排</title>
+    <link rel="stylesheet" href="energy-history.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- 背景装饰 -->
+    <div class="bg-decoration">
+        <div class="plug-deco">💡</div>
+        <div class="plug-deco">🔋</div>
+        <div class="plug-deco">🔌</div>
+        <div class="plug-deco">⚡</div>
+    </div>
+
+    <div class="container">
+        <div class="history-panel">
+            <!-- 头部 -->
+            <div class="header">
+                <button class="back-btn" onclick="goBack()">← 返回</button>
+                <div class="header-title">
+                    <span class="title-icon">🔋</span>
+                    <span>电量使用记录</span>
+                </div>
+                <div class="header-actions">
+                    <button class="settings-btn" onclick="toggleSettings()" title="设置">⚙️</button>
+                    <span class="device-ip" id="deviceIp">--</span>
+                </div>
+            </div>
+
+            <!-- 设置面板（默认隐藏） -->
+            <div class="settings-panel" id="settingsPanel" style="display: none;">
+                <div class="settings-title">⚙️ 设置</div>
+                <div class="settings-row">
+                    <label>电价（元/kWh）：</label>
+                    <input type="number" id="electricityPrice" value="0.6" min="0" max="10" step="0.01" class="settings-input">
+                    <button class="settings-save-btn" onclick="saveSettings()">保存</button>
+                </div>
+                <div class="settings-hint">💡 修改电价后会自动重新计算费用</div>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">⚡</div>
+                    <div class="stat-value" id="todayEnergy">--</div>
+                    <div class="stat-label">今日用电</div>
+                    <div class="stat-unit">Wh</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📅</div>
+                    <div class="stat-value" id="weekEnergy">--</div>
+                    <div class="stat-label">本周用电</div>
+                    <div class="stat-unit">kWh</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📆</div>
+                    <div class="stat-value" id="monthEnergy">--</div>
+                    <div class="stat-label">本月用电</div>
+                    <div class="stat-unit">kWh</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">💰</div>
+                    <div class="stat-value" id="totalCost">--</div>
+                    <div class="stat-label">预估费用</div>
+                    <div class="stat-unit">元</div>
+                </div>
+            </div>
+
+            <!-- AI智能助手 -->
+            <div class="ai-assistant">
+                <div class="ai-header">
+                    <div class="ai-title">
+                        <span class="ai-icon">🤖</span>
+                        <span>AI智能助手</span>
+                    </div>
+                    <button class="ai-toggle-btn" onclick="toggleAI()" id="aiToggleBtn">展开</button>
+                </div>
+                <div class="ai-content" id="aiContent" style="display: none;">
+                    <div class="ai-insights" id="aiInsights">
+                        <div class="insight-loading">🤖 AI正在分析您的用电数据...</div>
+                    </div>
+                    <div class="ai-chat">
+                        <div class="ai-chat-messages" id="aiChatMessages">
+                            <div class="ai-message">
+                                <div class="ai-avatar">🤖</div>
+                                <div class="ai-text">你好！我是智能用电助手，可以帮你分析用电情况、提供节能建议。试试问我：<br>• "我的用电趋势如何？"<br>• "如何节省电费？"<br>• "有什么异常吗？"</div>
+                            </div>
+                        </div>
+                        <div class="ai-input-area">
+                            <input type="text" id="aiInput" class="ai-input" placeholder="问我任何关于用电的问题..." onkeypress="handleAIEnter(event)">
+                            <button class="ai-send-btn" onclick="sendAIMessage()">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 时间范围选择 -->
+            <div class="time-selector">
+                <button class="time-btn active" data-range="day" onclick="changeTimeRange('day')">今日</button>
+                <button class="time-btn" data-range="week" onclick="changeTimeRange('week')">本周</button>
+                <button class="time-btn" data-range="month" onclick="changeTimeRange('month')">本月</button>
+            </div>
+
+            <!-- 图表类型切换 -->
+            <div class="chart-type-selector">
+                <button class="chart-type-btn active" data-type="line" onclick="changeChartType('line')">
+                    <span>📈</span> 折线图
+                </button>
+                <button class="chart-type-btn" data-type="bar" onclick="changeChartType('bar')">
+                    <span>📊</span> 柱状图
+                </button>
+            </div>
+
+            <!-- 图表容器 -->
+            <div class="chart-container">
+                <canvas id="energyChart"></canvas>
+            </div>
+
+            <!-- 详细记录 -->
+            <div class="records-section">
+                <div class="section-title">
+                    <span class="title-icon">📋</span>
+                    <span>详细记录</span>
+                </div>
+                <div class="records-list" id="recordsList">
+                    <!-- 记录项将通过JavaScript动态生成 -->
+                </div>
+            </div>
+
+            <!-- 底部信息 -->
+            <div class="footer-info">
+                <p>💡 电价按0.6元/kWh计算</p>
+                <p>🔄 数据每5分钟更新一次</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="energy-history.js"></script>
+</body>
+</html>
